@@ -140,3 +140,36 @@ export const getEnrolledStudentsData = async (req, res) => {
     }
 
 }
+
+// deleting the course
+export const deleteCourse = async (req, res) => {
+  try {
+    const educatorId = req.auth().userId
+    const { courseId } = req.params
+
+    const course = await Course.findOne({
+      _id: courseId,
+      educator: educatorId
+    })
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found or unauthorized"
+      })
+    }
+
+    await Course.findByIdAndDelete(courseId)
+
+    res.json({
+      success: true,
+      message: "Course deleted successfully"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
